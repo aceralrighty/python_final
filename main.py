@@ -8,10 +8,14 @@ app = Flask(__name__, template_folder='templates')
 engine = create_engine('sqlite:///test.db')
 app.secret_key = "secret"
 
-@app.route('/')
+
+@app.route("/")
 def index():
-    ss = Session()
-    return render_template("index.html")
+    return render_template('index.html')
+
+@app.route("/add_room")
+def add_room():
+    return render_template('add_room.html')
 
 @app.route('/add_supplies', methods=['GET', 'POST'])
 def add_supplies():
@@ -25,3 +29,4 @@ def add_supplies():
         ss.add(new_supply)
         ss.commit()
         ss.close()
+
