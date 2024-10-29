@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey, Numeric, Computed
 from sqlalchemy.orm import declarative_base, relationship
 
-engine = create_engine('sqlite:///test.db')
+engine = create_engine('sqlite:///supplies.db')
 Base = declarative_base()
 
 
