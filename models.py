@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey, Numeric, Computed
-from sqlalchemy.orm import declarative_base, relationship
+from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 
 engine = create_engine('sqlite:///supplies.db')
 Base = declarative_base()
@@ -31,3 +31,7 @@ class Supply(Base):
 
     def __repr__(self):
         return f"Name: {self.name}\nQuantity: {self.quantity}\nCost: {self.cost_per_item}\nTotal Supply Cost: {self.total_supply_cost}"
+
+Base.metadata.create_all(engine)
+Session = sessionmaker(bind=engine)
+ss = Session()
