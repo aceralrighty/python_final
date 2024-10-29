@@ -3,3 +3,11 @@ from sqlalchemy import create_engine
 app = Flask(__name__)
 engine = create_engine('sqlite:///test.db')
 app.secret_key = "secret"
+
+@app.route("/")
+def index():
+    return render_template('index.html')
+
+@app.route("/add_room")
+def add_room():
+    return render_template('add_room.html')
