@@ -38,6 +38,11 @@ class Room(Base):
                 f"Tiling Cost: {self.tiling_cost_per_sqft}\n"
                 f"Tiling Area: {self.tiling_area}")
 
+    def calc_cost(self, user):
+        total_tile_cost = self.tiling_area * self.tiling_cost_per_sqft
+        total_flooring_cost = self.Surface_Area * self.Flooring_cost_per_sqft
+        total_remodel_cost = total_flooring_cost + total_tile_cost + Supply.total_supply_cost
+
 
 class Supply(Base):
     __tablename__ = 'supply'
