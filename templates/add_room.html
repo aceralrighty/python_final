@@ -1,19 +1,32 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Add Room</title>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Add Room</title>
 </head>
 <body>
     {% extends "layout.html" %}
-    {#  TODO Add form to add rooms  #}
 
     {% block content %}
-        <h1>Adding new Room</h1>
-        <form action="/add_room">
+        <form action="/add_room" method="post">
+            <label for="room_name">Room Name</label>
+            <input type="text" name="room_name" id="room_name">
 
+            <label for="surface_area">Surface Area (sq ft)</label>
+            <input type="text" name="surface_area" id="surface_area">
+
+            <label for="flooring_type">Type of Flooring</label>
+            <select name="flooring_type" id="flooring_type" multiple>
+                {% for flooring_type in flooring_types %}
+                    <option value="{{ flooring_type }}">{{ flooring_type['type'] }} - ${{ flooring_type['price'] }}</option>
+                {% endfor %}
+            </select>
+
+            <input type="submit" value="Add Room">
         </form>
     {% endblock %}
-
 </body>
 </html>
