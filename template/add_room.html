@@ -9,6 +9,24 @@
 </head>
 <body>
     {% extends "layout.html" %}
-    {#  TODO Add form to add rooms  #}
+
+    {% block content %}
+        <form action="/add_room" method="post">
+            <label for="room_name">Room Name</label>
+            <input type="text" name="room_name" id="room_name">
+
+            <label for="surface_area">Surface Area (sq ft)</label>
+            <input type="text" name="surface_area" id="surface_area">
+
+            <label for="flooring_type">Type of Flooring</label>
+            <select name="flooring_type" id="flooring_type" multiple>
+                {# TODO: Replace with loop #}
+                <option value='{"type": "Tile", "price": 9.99}'>Tile</option>
+                <option value='{"type": "Hardwood", "price": 9.99}'>Hardwood</option>
+            </select>
+
+            <input type="submit" value="Add Room">
+        </form>
+    {% endblock %}
 </body>
 </html>
