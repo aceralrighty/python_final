@@ -20,9 +20,9 @@
 
             <label for="flooring_type">Type of Flooring</label>
             <select name="flooring_type" id="flooring_type" multiple>
-                {# TODO: Replace with loop #}
-                <option value='{"type": "Tile", "price": 9.99}'>Tile</option>
-                <option value='{"type": "Hardwood", "price": 9.99}'>Hardwood</option>
+                {% for flooring_type in flooring_types %}
+                    <option value="{{ flooring_type }}">{{ flooring_type['type'] }} - ${{ flooring_type['price'] }}</option>
+                {% endfor %}
             </select>
 
             <input type="submit" value="Add Room">
