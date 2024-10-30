@@ -1,108 +1,140 @@
-# python_final
-House Remodeling Supply Tracker
-Objective:
+# House Remodeling Supply Tracker
 
-You will build a Python web application using Flask and SQLAlchemy to track the supplies and costs needed for remodeling various rooms in a house. The application will allow users to enter detailed information about each room, including the type of remodeling (tiling, flooring, painting, etc.) and the materials required. The app will calculate total remodeling costs, display detailed breakdowns, and visualize data using Seaborn bar graphs.
-This project will require:
+A Python web application using Flask and SQLAlchemy to track supplies, costs, and requirements for remodeling rooms in a house. This application enables users to input detailed remodeling information, view cost breakdowns, and visualize costs across rooms with Seaborn bar graphs.
 
-•	SQLAlchemy models with foreign key relationships.
-•	Instantiable classes and complex data handling using dictionaries, tuples, and lists.
-•	Unit tests using PyTest to validate application functionality.
-•	A web interface to add, edit, and display room and supply data.
-•	A Seaborn bar graph to visually represent the data.
+---
 
+## Objective
 
-Project Requirements:
+The project aims to:
+- Track and manage room-specific remodeling needs and associated supplies.
+- Calculate and display total remodeling costs, including a breakdown for flooring, tiling, and supplies.
+- Provide data visualizations to compare remodeling expenses across rooms.
 
-1. SQLAlchemy Models:
-You will create two main models: Room and Supply. Each room will have a list of associated supplies and costs.
+---
 
-Room Model:
-•	id: Primary key (integer).
-•	name: The name of the room (string).
-•	surface_area: Total surface area of the room in square feet (float).
-•	flooring_type: Type of flooring (e.g., "Hardwood", "Tile") (string).
-•	flooring_cost_per_sqft: Cost of the flooring per square foot (float).
-•	New Fields:
-o	is_tiling_needed: Boolean indicating whether tiling is needed (boolean).
-o	tile_type: Type of tile (e.g., "Ceramic", "Porcelain") (string).
-o	tile_cost_per_sqft: Cost of tiling per square foot (float).
-o	tiling_area: Area of the room that requires tiling (float).
-o	total_tile_cost: Calculated field for the total cost of tiling (tiling_area * tile_cost_per_sqft).
-o	total_flooring_cost: Total cost for the flooring, calculated as surface_area * flooring_cost_per_sqft.
-o	total_remodel_cost: Calculated field for the total remodeling cost (sum of flooring, tiling, and supply costs).
+## Key Features
 
-Supply Model:
-•	id: Primary key (integer).
-•	room_id: Foreign key linking to the Room model.
-•	name: Name of the supply (string).
-•	quantity: Quantity of the supply needed (integer).
-•	cost_per_item: Cost of each supply item (float).
-•	total_supply_cost: Calculated field for the total cost of the supply (quantity * cost_per_item).
+1. **Room and Supply Management**
+   - Add and edit room details, including floor and tiling specifics.
+   - Track individual supplies required for each room.
+   - Calculate total costs based on user inputs.
 
-Foreign Key Relationship:
-•	room_id in Supply will be a foreign key that references id in the Room model.
+2. **Data Visualization**
+   - Display a Seaborn bar graph comparing remodeling costs across rooms.
 
-2. Web Application Pages:
+3. **Unit Testing**
+   - Use PyTest to ensure accuracy in calculations and application functionality.
 
-Home Page:
-•	Lists all the rooms that are being remodeled.
-•	Displays total remodeling costs for each room.
+---
 
-Add Room Page:
-•	Form to add a new room, capturing:
-o	Room name.
-o	Surface area in square feet.
-o	Flooring type and cost per square foot.
-o	Checkbox for tiling requirement (if applicable).
-o	Tile type, cost per square foot, and tiling area (if applicable).
-o	Button to submit room details.
+## Project Requirements
 
-Edit Room Page:
-•	Form pre-filled with existing room data to allow updating information.
+### 1. SQLAlchemy Models
 
-Room Details Page:
-•	Displays the details for a specific room, including:
-o	Flooring type and cost.
-o	Tiling information (if tiling is required).
-o	Total costs for flooring, tiling, and supplies.
-o	A list of all associated supplies and their costs.
-o	A total remodeling cost for the room, which is:
-	total_remodel_cost = total_flooring_cost + total_tile_cost + sum(supply.total_supply_cost for supply in room.supplies)
+The application uses two main models for data organization:
 
-Add Supply Page:
-•	Form to add supplies to a specific room:
-o	Supply name.
-o	Quantity.
-o	Cost per item.
-o	Button to submit supply details.
+#### Room Model
+Defines remodeling specifics for each room.
+- **Fields**:
+  - `id`: Primary key.
+  - `name`: Name of the room.
+  - `surface_area`: Room area in square feet.
+  - `flooring_type`: Type of flooring (e.g., Hardwood, Tile).
+  - `flooring_cost_per_sqft`: Flooring cost per square foot.
+  - **Optional Tiling Fields**:
+    - `is_tiling_needed`: Boolean indicating if tiling is required.
+    - `tile_type`: Type of tile (e.g., Ceramic, Porcelain).
+    - `tile_cost_per_sqft`: Tiling cost per square foot.
+    - `tiling_area`: Area requiring tiling.
+- **Calculated Fields**:
+  - `total_tile_cost`: Tiling cost (`tiling_area * tile_cost_per_sqft`).
+  - `total_flooring_cost`: Flooring cost (`surface_area * flooring_cost_per_sqft`).
+  - `total_remodel_cost`: Total remodeling cost, calculated as:
+    - `total_flooring_cost + total_tile_cost + sum(supply.total_supply_cost for each supply)`
 
+#### Supply Model
+Tracks individual supplies for each room.
+- **Fields**:
+  - `id`: Primary key.
+  - `room_id`: Foreign key linking to Room.
+  - `name`: Supply name.
+  - `quantity`: Quantity required.
+  - `cost_per_item`: Cost per item.
+  - `total_supply_cost`: Total cost of the supply (`quantity * cost_per_item`).
 
-Supply Details Page:
-•	Displays details of a specific supply, including total cost.
+---
 
-3. Advanced Calculations:
+### 2. Web Application Pages
 
-Total Room Remodeling Cost:
-o	total_remodel_cost = total_flooring_cost + total_tile_cost + sum(supply.total_supply_cost for supply in room.supplies)
-This calculation includes:
-•	Flooring cost (surface_area * flooring_cost_per_sqft).
-•	Tiling cost (if applicable: tiling_area * tile_cost_per_sqft).
-•	Supply costs (quantity * cost_per_item for each supply).
+#### Home Page
+- Lists all rooms being remodeled with their total remodeling costs.
 
-Tile Needed Calculation:
-•	total_tile_cost = tiling_area * tile_cost_per_sqft
+#### Add Room Page
+- Form to add a new room, capturing:
+  - Room name
+  - Surface area
+  - Flooring type and cost
+  - Optional tiling details (tile type, cost, and area if applicable)
 
-4. Seaborn Bar Graph Visualization:
+#### Edit Room Page
+- Form pre-filled with room data for editing.
 
-You will create a Seaborn bar graph on a separate page that compares the total tiling costs or total remodeling costs across all rooms.
-•	X-axis: Room names.
-•	Y-axis: Total tiling cost (or total remodeling cost).
-•	This graph will allow users to quickly visualize and compare costs between rooms.
+#### Room Details Page
+- Shows room details including flooring, tiling, and associated supply costs.
+- Displays total remodeling cost, calculated as:
+  - `total_remodel_cost = total_flooring_cost + total_tile_cost + sum(supply.total_supply_cost for each supply)`
 
-5. Unit Testing with PyTest:
+#### Add Supply Page
+- Form to add supplies for a room, capturing:
+  - Supply name
+  - Quantity
+  - Cost per item
 
-You will create unit tests to ensure the correctness of your calculations and functionality.
-•	You are developing your code. You need to be able to estimate what 80% coverage is based on what you build. It is your job as a developer to develop that deeper level of understanding.
+#### Supply Details Page
+- Displays details of a specific supply, including total cost.
 
+---
 
+### 3. Calculations
+
+#### Total Room Remodeling Cost
+- Calculated as:
+  - `total_remodel_cost = total_flooring_cost + total_tile_cost + sum(supply.total_supply_cost for each supply)`
+- Includes:
+  - Flooring cost (`surface_area * flooring_cost_per_sqft`)
+  - Tiling cost (`tiling_area * tile_cost_per_sqft` if tiling is needed)
+  - Supply costs (`quantity * cost_per_item` for each supply)
+
+---
+
+### 4. Data Visualization
+
+The application includes a Seaborn bar graph to compare costs between rooms:
+- **X-axis**: Room names
+- **Y-axis**: Total tiling or total remodeling cost
+- Helps users visualize and compare expenses quickly.
+
+---
+
+### 5. Unit Testing with PyTest
+
+- Develop unit tests to validate all major calculations and functionalities.
+- Aim for ~80% test coverage to ensure robust application performance.
+
+---
+
+## Getting Started
+
+### Prerequisites
+- Python 3.x
+- Flask
+- SQLAlchemy
+- Seaborn
+- PyTest
+
+### Installation
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/house_remodeling_tracker.git
+   cd house_remodeling_tracker
