@@ -1,5 +1,4 @@
 from enum import Enum
-
 from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey, Numeric, Computed, SQLEnum
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 
