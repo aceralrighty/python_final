@@ -24,10 +24,6 @@ def is_tiling_needed(is_tiling):
     else:
         return False
 
-def room_details():
-    ss.query(Room)
-
-
 @app.route('/add_supplies', methods=['GET', 'POST'])
 def add_supplies():
     if request.method == 'POST':
@@ -46,7 +42,12 @@ def add_supplies():
         ss.add(new_supply)
         ss.commit()
         ss.close()
-@app.route("/room_details", methods=['GET', 'POST'])
-def room_details():
+@app.route("/supplies_details", methods=['GET', 'POST'])
+def room_details(room_id):
     if request.method == 'POST':
-        room_details()
+        room_deets = ss.query(Room).get(room_id)
+
+        if room_deets:
+            cost = room_deets.calc_cost()
+
+            return render_template("supplies_details.html", room_deets=room_deets, **cost)
