@@ -1,18 +1,17 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
-from models import Supply
+from models import Supply, Room
 
 app = Flask(__name__, template_folder='templates')
 engine = create_engine('sqlite:///test.db')
 app.secret_key = "secret"
 
-
-
-
+ss = Session()
 @app.route("/")
 def index():
     return render_template('index.html')
+
 
 @app.route("/add_room")
 def add_room():
@@ -25,17 +24,29 @@ def is_tiling_needed(is_tiling):
     else:
         return False
 
+def room_details():
+    ss.query(Room)
+
+
 @app.route('/add_supplies', methods=['GET', 'POST'])
 def add_supplies():
-    if request.method == 'GET':
+    if request.method == 'POST':
         session["supply_name"] = request.form["supply_name"]
         session["quantity"] = request.form["quantity"]
         session['cost_per_item'] = request.form["cost_per_item"]
-        session["is_tiling_needed"] = is_tiling_needed(request.form["is_tiling_needed"])
 
-        ss = Session()
-        new_supply = Supply(name=session["supply_name"], quantity=session["quantity"], cost_per_item=session["cost_per_item"])
+        supply_data = {
+            "supply_name": session["supply_name"],
+            "quantity": session["quantity"],
+            "cost_per_item": session["cost_per_item"],
+        }
+
+
+        new_supply = Supply(**supply_data)
         ss.add(new_supply)
         ss.commit()
         ss.close()
-
+@app.route("/room_details", methods=['GET', 'POST'])
+def room_details():
+    if request.method == 'POST':
+        room_details()
