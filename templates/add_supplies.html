@@ -9,10 +9,22 @@
 </head>
 <body>
     {% extends "layout.html" %}
-    {#  TODO Add form to add supplies  #}
+
     {% block content %}
         <form action="/add_supplies">
+            <label for="room_name">Room Name:</label>
+            <input type="text" name="room_name" id="room_name">
 
+            <label for="supply_name">Supply Name:</label>
+            <input type="text" name="supply_name" id="supply_name">
+
+            <label for="quantity">Quantity:</label>
+            <input type="number" name="quantity" id="quantity">
+            
+            <label for="cost_per_item">Cost per Item:</label>
+            <input type="text" name="cost_per_item" id="cost_per_item">
+
+            <input type="submit" value="Add Supply">
         </form>
     {% endblock %}
 </body>
