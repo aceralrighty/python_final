@@ -2,7 +2,7 @@ from enum import Enum
 from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey, Numeric, Computed, Enum as SQLEnum
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 
-engine = create_engine('sqlite:///supplies.db')
+engine = create_engine('sqlite:///supply_tracker.db')
 Base = declarative_base()
 
 
