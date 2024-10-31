@@ -14,6 +14,7 @@ app.secret_key = "secret"
 def index():
     return render_template('index.html')
 
+
 @app.route("/add_room")
 def add_room():
     if request.method == "POST":
@@ -48,17 +49,31 @@ def room_details():
 
 @app.route('/add_supplies', methods=['GET', 'POST'])
 def add_supplies():
-    if request.method == 'GET':
+    if request.method == 'POST':
         session["supply_name"] = request.form["supply_name"]
         session["quantity"] = request.form["quantity"]
         session['cost_per_item'] = request.form["cost_per_item"]
-        session["is_tiling_needed"] = is_tiling_needed(request.form["is_tiling_needed"])
 
-        ss = Session()
-        new_supply = Supply(name=session["supply_name"], quantity=session["quantity"], cost_per_item=session["cost_per_item"])
+        supply_data = {
+            "supply_name": session["supply_name"],
+            "quantity": session["quantity"],
+            "cost_per_item": session["cost_per_item"],
+        }
+
+
+        new_supply = Supply(**supply_data)
         ss.add(new_supply)
         ss.commit()
         ss.close()
+@app.route("/supplies_details", methods=['GET', 'POST'])
+def room_details(room_id):
+    if request.method == 'POST':
+        room_deets = ss.query(Room).get(room_id)
+
+        if room_deets:
+            cost = room_deets.calc_cost()
+
+            return render_template("supplies_details.html", room_deets=room_deets, **cost)
 
 if __name__ == '__main__':
     app.run(debug=True)

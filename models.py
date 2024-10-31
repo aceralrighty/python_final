@@ -45,6 +45,13 @@ class Room(Base):
         total_supplies = sum(supply.total_supply_cost for supply in self.supplies)
         total_remodel_cost = total_flooring_cost + total_tile_cost + total_supplies
 
+        return {
+            'total_tile_cost': total_tile_cost,
+            'total_flooring_cost': total_flooring_cost,
+            'total_supplies_cost': total_supplies,
+            'total_remodel_cost': total_remodel_cost
+        }
+
 
 class Supply(Base):
     __tablename__ = 'supply'
