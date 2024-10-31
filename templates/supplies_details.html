@@ -18,6 +18,7 @@
     <table>
         <thead>
             <tr>
+                <th>Room</th>
                 <th>Supply Name</th>
                 <th>Quantity</th>
                 <th>Cost per Item (in $)</th>
@@ -25,6 +26,7 @@
         </thead>
         <tbody>
             {% for supply in supplies %}
+                <td>{{ supply['room'] }}</td>
             	<td>{{ supply['name'] }}</td>
                 <td>{{ supply['quantity'] }}</td>
                 <td>{{ supply['cost'] }}</td>
