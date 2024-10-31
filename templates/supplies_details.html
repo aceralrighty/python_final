@@ -9,7 +9,27 @@
 </head>
 <body>
     {% extends "layout.html" %}
-    {#TODO Display list of supplies#}
+    <form action="/supplies_details" method="post">
+        <label for="name">Filter by Name</label>
+        <input type="text" name="name" id="name">
+        <input type="submit" value="Filter">
+    </form>
 
+    <table>
+        <thead>
+            <tr>
+                <th>Supply Name</th>
+                <th>Quantity</th>
+                <th>Cost per Item (in $)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for supply in supplies %}
+            	<td>{{ supply['name'] }}</td>
+                <td>{{ supply['quantity'] }}</td>
+                <td>{{ supply['cost'] }}</td>
+            {% endfor %}
+        </tbody>
+    </table>
 </body>
 </html>
