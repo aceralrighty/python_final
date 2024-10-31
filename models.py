@@ -1,36 +1,41 @@
-from enum import Enum
-from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey, Numeric, Computed, SQLEnum
+
+from enum import Enum as PyEnum
+from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 
-engine = create_engine('sqlite:///supplies.db')
+engine = create_engine('sqlite:///supply_tracker.db')
+
 Base = declarative_base()
 
-
-class TileType(Enum):
-    CERAMIC = "Ceramic",
-    PORCELAIN = "Porcelain",
-    MARBLE = "Marble",
-    GRANITE = "Granite",
-    MOSAIC = "Mosaic",
-    GLASS = "Glass",
+Session = sessionmaker(bind=engine)
+ss = Session()
 
 
-class FloorType(Enum):
-    HARDWOOD = "Hard Wood",
-    TILE = "Tile",
+class TileType(PyEnum):
+    CERAMIC = "Ceramic"
+    PORCELAIN = "Porcelain"
+    MARBLE = "Marble"
+    GRANITE = "Granite"
+    MOSAIC = "Mosaic"
+    GLASS = "Glass"
+
+
+class FloorType(PyEnum):
+    HARDWOOD = "Hard Wood"
+    TILE = "Tile"
 
 
 class Room(Base):
     __tablename__ = 'rooms'
-    Id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
     name = Column(String)
     Surface_Area = Column(Float)
-    Flooring_type = Column(SQLEnum(FloorType))
+    Flooring_type = Column(String)
     Flooring_cost_per_sqft = Column(Float)
-    tiling = Column(SQLEnum(TileType))
+    tiling = Column(String)
     tiling_cost_per_sqft = Column(Float)
     tiling_area = Column(Float)
-    supplies = relationship("supply", back_populates="rooms")
+    supplies = relationship("Supply", back_populates="room")
 
     def __repr__(self):
         return (f"Name: {self.name}\nSurface_Area: {self.Surface_Area}\nFlooring Type: {self.Flooring_type}\n"
@@ -55,24 +60,23 @@ class Room(Base):
 
 class Supply(Base):
     __tablename__ = 'supply'
-    Id = Column(Integer, primary_key=True)
-    room_id = Column(Integer, ForeignKey('rooms.Id'))
+    id = Column(Integer, primary_key=True)
+    room_id = Column(Integer, ForeignKey('rooms.id'))
     supply_name = Column(String)
     quantity = Column(Integer)
     cost_per_item = Column(Float)
-    total_supply_cost = Column(Numeric, Computed('quantity * cost_per_item'))
+    total_supply_cost = Column(Float)
 
-    rooms = relationship("rooms", back_populates="supply")
+    room = relationship("Room", back_populates="supplies")
 
     def __init__(self, supply_name, quantity, cost_per_item):
         self.supply_name = supply_name
         self.quantity = quantity
         self.cost_per_item = cost_per_item
+        self.total_supply_cost = cost_per_item * quantity
 
     def __repr__(self):
         return f"Name: {self.supply_name}\nQuantity: {self.quantity}\nCost: {self.cost_per_item}\nTotal Supply Cost: {self.total_supply_cost}"
 
 
 Base.metadata.create_all(engine)
-Session = sessionmaker(bind=engine)
-ss = Session()
