@@ -10,6 +10,8 @@ app = Flask(__name__,)
 app.secret_key = "secret"
 
 
+
+
 @app.route("/")
 def index():
     room = ss.query(Room).all()
@@ -41,6 +43,22 @@ def add_room():
         return redirect(url_for("index"))
 
     return render_template('add_room.html')
+
+
+# @app.route("/edit_room")
+# def edit_room():
+#     if request.method == "GET":
+#
+#     return render_template("edit_room.html")
+
+@app.route("/room_details")
+def room_details():
+    session['name']=request.form['name']
+    return render_template('room_details.html',room=get_specific_room(session['name']))
+
+
+def get_specific_room(name):
+    return ss.query(Room).filter_by(name=name).first()
 
 
 def is_tiling_needed(is_tiling):
