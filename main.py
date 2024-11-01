@@ -1,15 +1,18 @@
+import os
+
 from flask import Flask, render_template, request, session, redirect, url_for
 from flask import Flask, render_template, request, redirect, url_for, session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from models import Supply, FloorType, TileType, Room
-
+import matplotlib.pyplot as plt
+import seaborn as sns
 from models import ss, Room, Supply
 
-app = Flask(__name__,)
+app = Flask(__name__, )
 app.secret_key = "secret"
 
-
+os.makedirs("static", exist_ok=True)
 
 
 @app.route("/")
@@ -37,6 +40,12 @@ def add_room():
             "tiling_cost_per_sqft": tiling_cost_per_sqft,
             "tiling_area": tiling_area,
         }
+        plt.figure(figsize=(10, 6))
+        sns.barplot(x=tiling_cost_per_sqft, y=flooring_cost_per_sqft, data=room_data, palette="Blues")
+        img_path = os.path.join(app.root_path, "static", "graph.png")
+        plt.savefig(img_path)
+        plt.close()
+
         ss.add(**room_data)
         ss.commit()
         ss.close()
@@ -53,8 +62,8 @@ def add_room():
 
 @app.route("/room_details")
 def room_details():
-    session['name']=request.form['name']
-    return render_template('room_details.html',room=get_specific_room(session['name']))
+    session['name'] = request.form['name']
+    return render_template('room_details.html', room=get_specific_room(session['name']))
 
 
 def get_specific_room(name):
@@ -66,6 +75,7 @@ def is_tiling_needed(is_tiling):
         return True
     else:
         return False
+
 
 @app.route('/add_supplies', methods=['GET', 'POST'])
 def add_supplies():
@@ -79,7 +89,6 @@ def add_supplies():
             "quantity": session["quantity"],
             "cost_per_item": session["cost_per_item"],
         }
-
 
         new_supply = Supply(**supply_data)
         ss.add(new_supply)
@@ -96,5 +105,7 @@ def room_details(room_id):
             cost = room_deets.calc_cost()
 
             return render_template("supplies_details.html", room_deets=room_deets, **cost)
+
+
 if __name__ == '__main__':
     app.run()
