@@ -20,8 +20,8 @@ class TileType(PyEnum):
 
 
 class FloorType(PyEnum):
-    HARDWOOD = "Hard Wood"
-    TILE = "Tile"
+    HARDWOOD = "Hard Wood", 1.99
+    TILE = "Tile", 2.99
 
 
 class Room(Base):

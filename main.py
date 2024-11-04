@@ -51,7 +51,7 @@ def add_room():
         ss.close()
         return redirect(url_for("index"))
 
-    return render_template('add_room.html')
+    return render_template('add_room.html', flooring_types=FloorType.__members__.items())
 
 
 @app.route("/edit_room")
