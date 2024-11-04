@@ -24,7 +24,7 @@ def index():
 @app.route("/add_room")
 def add_room():
     if request.method == "POST":
-        name = request.form["name"]
+        name = request.form["room_name"]
         surface_area = float(request.form["surface_area"])
         flooring_type = request.form["flooring_type"]
         flooring_cost_per_sqft = float(request.form["flooring_cost_per_sqft"])
@@ -54,11 +54,11 @@ def add_room():
     return render_template('add_room.html')
 
 
-# @app.route("/edit_room")
-# def edit_room():
-#     if request.method == "GET":
-#
-#     return render_template("edit_room.html")
+@app.route("/edit_room")
+def edit_room():
+    if request.method == "GET":
+        session['room_name'] = request.form["room_name"]
+    return render_template("edit_room.html",room=get_specific_room(session['room_name']))
 
 @app.route("/room_details")
 def room_details():
@@ -97,7 +97,7 @@ def add_supplies():
 
 
 @app.route("/supplies_details", methods=['GET', 'POST'])
-def room_details(room_id):
+def supply_details(room_id):
     if request.method == 'POST':
         room_deets = ss.query(Room).filter(Room.id == room_id).first()
 
