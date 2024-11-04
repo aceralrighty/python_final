@@ -7,10 +7,14 @@ from sqlalchemy.orm import Session
 from models import Supply, FloorType, TileType, Room
 import matplotlib.pyplot as plt
 import seaborn as sns
-from models import ss, Room, Supply
+from models import Room, Supply
 
 app = Flask(__name__, )
 app.secret_key = "secret"
+
+os.makedirs("static", exist_ok=True)
+
+ss = Session()
 
 os.makedirs("static", exist_ok=True)
 
@@ -24,7 +28,7 @@ def index():
 @app.route("/add_room")
 def add_room():
     if request.method == "POST":
-        name = request.form["room_name"]
+        name = request.form["name"]
         surface_area = float(request.form["surface_area"])
         flooring_type = request.form["flooring_type"]
         flooring_cost_per_sqft = float(request.form["flooring_cost_per_sqft"])
@@ -41,7 +45,7 @@ def add_room():
             "tiling_area": tiling_area,
         }
         plt.figure(figsize=(10, 6))
-        sns.barplot(x=tiling_cost_per_sqft, y=flooring_cost_per_sqft, data=room_data, palette="Blues")
+        sns.barplot(x=tiling_cost_per_sqft, y=name, data=room_data, palette="Blues")
         img_path = os.path.join(app.root_path, "static", "graph.png")
         plt.savefig(img_path)
         plt.close()
