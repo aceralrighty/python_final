@@ -7,7 +7,7 @@ engine = create_engine('sqlite:///supply_tracker.db')
 Base = declarative_base()
 
 Session = sessionmaker(bind=engine)
-ss = Session()
+
 
 
 class TileType(PyEnum):
