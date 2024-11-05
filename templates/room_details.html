@@ -5,9 +5,17 @@
     <title>Title</title>
 </head>
 <body>
-<form action="room_details/">
+<form action="/room_details">
     <label for="name">What is the name of the room you'd like to display? </label>
     <input type="text" id="name" name="name" required placeholder="This field is required"/>
+
+    <h2>Room Details</h2>
+    <ul>
+        <li>Room Name: {{ room.name }}</li>
+        <li>Surface Area: {{ room.surface_area }}</li>
+        <li>Floor Type: {{ room.flooring_type }}</li>
+        <li>Tiling (if applicable): {{ room.tiling }}</li>
+    </ul>
 </form>
 </body>
 </html>
