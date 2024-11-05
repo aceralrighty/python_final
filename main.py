@@ -33,8 +33,9 @@ def add_room():
         session["flooring_type"] = floor_type
         session["flooring_cost_per_sqft"] = float(getattr(FloorType, floor_type).value)
 
-        session["tiling"] = request.form["tiling"]
-        session["tiling_cost_per_sqft"] = float(request.form["tiling_cost_per_sqft"])
+        tiling = request.form["tiling"]
+        session["tiling"] = tiling
+        session["tiling_cost_per_sqft"] = float(getattr(TileType, tiling).value) if tiling else 0
         session["tiling_area"] = float(request.form["tiling_area"])
         room_data = {
             "name": session["name"],

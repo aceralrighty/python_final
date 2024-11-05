@@ -27,12 +27,15 @@
         </select>
 
         {% if tiling == 'yes' %}
-            <label for="flooring_tile">Flooring Tile</label>
-            <select id="flooring_tile" name="flooring_tile">
+            <label for="tiling">Flooring Tile</label>
+            <select id="tiling" name="tiling">
                 {% for name, value in flooring_tiles %}
                     <option value="{{ name }}">{{ name.capitalize() }} - ${{ value.value }}</option>
                 {% endfor %}
             </select>
+
+            <label for="tiling_area">Area of Tiling</label>
+            <input type="text" name="tiling_area" id="tiling_area">
         {% endif %}
 
         {% if total_tile_cost is defined and total_tile_cost > 0 %}
