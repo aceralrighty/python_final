@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import matplotlib.pyplot as plt
 import seaborn as sns
-from models import Room, Supply
+from models import Room, Supply, FloorType, TileType
 
 app = Flask(__name__, )
 app.secret_key = "secret"
@@ -18,8 +18,23 @@ Session = sessionmaker(bind=engine)
 @app.route("/")
 def index():
     with Session() as ss:
+        graph()
         room = ss.query(Room).all()
-        return render_template('index.html', rooms=room, plot_url=url_for("static", filename="graph.png"))
+    return render_template('index.html', rooms=room, plot_url=url_for("static", filename="graph.png"))
+
+
+def graph():
+    with Session() as ss:
+        rooms = ss.query(Room).all()
+        tiling_costs = [room.tiling_cost_per_sqft for room in rooms]
+        room_names = [room.name for room in rooms]
+        plt.figure(figsize=(10, 6))
+        sns.barplot(x=tiling_costs, y=room_names, palette="Blues")
+        plt.xlabel("Tiling Cost per sqft")
+        plt.ylabel("Room Name")
+        img_path = os.path.join(app.root_path, "static", "graph.png")
+        plt.savefig(img_path)
+        plt.close()
 
 
 @app.route("/add_room", methods=["GET", "POST"])
@@ -27,10 +42,14 @@ def add_room():
     if request.method == "POST":
         session["name"] = request.form["name"]
         session["surface_area"] = float(request.form["surface_area"])
-        session["flooring_type"] = request.form["flooring_type"]
-        session["flooring_cost_per_sqft"] = float(request.form["flooring_cost_per_sqft"])
-        session["tiling"] = request.form["tiling"]
-        session["tiling_cost_per_sqft"] = float(request.form["tiling_cost_per_sqft"])
+
+        floor_type = request.form["flooring_type"]
+        session["flooring_type"] = floor_type
+        session["flooring_cost_per_sqft"] = float(getattr(FloorType, floor_type).value)
+
+        tiling = request.form["tiling"]
+        session["tiling"] = tiling
+        session["tiling_cost_per_sqft"] = float(getattr(TileType, tiling).value) if tiling else 0
         session["tiling_area"] = float(request.form["tiling_area"])
         room_data = {
             "name": session["name"],
@@ -41,12 +60,7 @@ def add_room():
             "tiling_cost_per_sqft": session["tiling_cost_per_sqft"],
             "tiling_area": session["tiling_area"],
         }
-        plt.figure(figsize=(10, 6))
-        sns.barplot(x="Tiling Cost per Sqft", y="Room Name", tile=session["tiling_cost_per_sqft"], room=session["name"],
-                    palette="Blues")
-        img_path = os.path.join(app.root_path, "static", "graph.png")
-        plt.savefig(img_path)
-        plt.close()
+
         new_room = Room(**room_data)
         costs = new_room.calc_cost()
         with Session() as ss:
@@ -66,7 +80,8 @@ def add_room():
             **costs
         )
 
-    return render_template("add_room.html")
+    return render_template("add_room.html", flooring_types=FloorType.__members__.items(),
+                           flooring_tiles=TileType.__members__.items())
 
 
 @app.route("/edit_room")

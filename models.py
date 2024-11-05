@@ -47,7 +47,7 @@ class Room(Base):
         total_tile_cost = self.tiling_area * self.tiling_cost_per_sqft
         total_flooring_cost = self.Surface_Area * self.Flooring_cost_per_sqft
         total_supplies = sum(supply.total_supply_cost for supply in self.supplies)
-        total_remodel_cost = total_flooring_cost + total_tile_cost + total_supplies
+        total_remodel_cost = round(total_flooring_cost + total_tile_cost + total_supplies)
 
         return {
             'total_tile_cost': total_tile_cost,
