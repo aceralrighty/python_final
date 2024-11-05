@@ -5,13 +5,14 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="{{ url_for(static, filename='styles.css') }}">
     <title>House Remodel System</title>
 </head>
 <body>
     <header>
         <nav>
             <ul>
-                <li><a href="/index" methods="post">Home</a></li>
+                <li><a href="/" methods="post">Home</a></li>
                 <li><a href="/add_room" methods="post">Add Room</a></li>
                 <li><a href="/edit_room" methods="post">Edit Room</a></li>
                 <li><a href="/add_supplies" methods="post">Add Supplies</a></li>
