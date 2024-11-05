@@ -9,19 +9,18 @@ Base = declarative_base()
 Session = sessionmaker(bind=engine)
 
 
-
 class TileType(PyEnum):
-    CERAMIC = "Ceramic"
-    PORCELAIN = "Porcelain"
-    MARBLE = "Marble"
-    GRANITE = "Granite"
-    MOSAIC = "Mosaic"
-    GLASS = "Glass"
+    CERAMIC = 15.50
+    PORCELAIN = 10.75
+    MARBLE = 20.99
+    GRANITE = 15.25
+    MOSAIC = 10.00
+    GLASS = 10.99
 
 
 class FloorType(PyEnum):
-    HARDWOOD = "Hard Wood", 1.99
-    TILE = "Tile", 2.99
+    HARDWOOD = 7.99
+    TILE = 0
 
 
 class Room(Base):
