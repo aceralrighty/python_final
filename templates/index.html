@@ -20,14 +20,14 @@
         <thead>
         <tr>
             <th>Room Name</th>
-            <th>Remodeling Costs (in $)</th>
+            <th>Room Costs (in $)</th>
         </tr>
         </thead>
         <tbody>
         {% for room in rooms %}
             <tr>
-                <td>{{ room['name'] }}</td>
-                <td>{{ room['cost'] }}</td>
+                <td>{{ room.name }}</td>
+                <td>${{ room.calc_cost()['total_remodel_cost'] }}</td>
             </tr>
         {% endfor %}
         </tbody>
