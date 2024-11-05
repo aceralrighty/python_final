@@ -1,10 +1,8 @@
 import os
-
-from flask import Flask, render_template, request, session, redirect, url_for
 from flask import Flask, render_template, request, redirect, url_for, session
 from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
-from models import Supply, FloorType, TileType, Room
+from sqlalchemy.orm import sessionmaker
+
 import matplotlib.pyplot as plt
 import seaborn as sns
 from models import Room, Supply
@@ -14,55 +12,70 @@ app.secret_key = "secret"
 
 os.makedirs("static", exist_ok=True)
 
-ss = Session()
-
-os.makedirs("static", exist_ok=True)
+engine = create_engine('sqlite:///supply_tracker.db')
+Session = sessionmaker(bind=engine)
 
 
 @app.route("/")
 def index():
-    room = ss.query(Room).all()
-    return render_template('index.html', rooms=room)
+    with Session() as ss:
+        room = ss.query(Room).all()
+        return render_template('index.html', rooms=room, plot_url=url_for("static", filename="graph.png"))
 
 
-@app.route("/add_room")
+@app.route("/add_room", methods=["GET", "POST"])
 def add_room():
     if request.method == "POST":
-        name = request.form["name"]
-        surface_area = float(request.form["surface_area"])
-        flooring_type = request.form["flooring_type"]
-        flooring_cost_per_sqft = float(request.form["flooring_cost_per_sqft"])
-        tiling = request.form["tiling"]
-        tiling_cost_per_sqft = float(request.form["tiling_cost_per_sqft"])
-        tiling_area = float(request.form["tiling_area"])
+        session["name"] = request.form["name"]
+        session["surface_area"] = float(request.form["surface_area"])
+        session["flooring_type"] = request.form["flooring_type"]
+        session["flooring_cost_per_sqft"] = float(request.form["flooring_cost_per_sqft"])
+        session["tiling"] = request.form["tiling"]
+        session["tiling_cost_per_sqft"] = float(request.form["tiling_cost_per_sqft"])
+        session["tiling_area"] = float(request.form["tiling_area"])
         room_data = {
-            "name": name,
-            "surface_area": surface_area,
-            "flooring_type": flooring_type,
-            "flooring_cost_per_sqft": flooring_cost_per_sqft,
-            "tiling": tiling,
-            "tiling_cost_per_sqft": tiling_cost_per_sqft,
-            "tiling_area": tiling_area,
+            "name": session["name"],
+            "surface_area": session["surface_area"],
+            "flooring_type": session["flooring_type"],
+            "flooring_cost_per_sqft": session["flooring_cost_per_sqft"],
+            "tiling": session["tiling"],
+            "tiling_cost_per_sqft": session["tiling_cost_per_sqft"],
+            "tiling_area": session["tiling_area"],
         }
         plt.figure(figsize=(10, 6))
-        sns.barplot(x=tiling_cost_per_sqft, y=name, data=room_data, palette="Blues")
+        sns.barplot(x="Tiling Cost per Sqft", y="Room Name", tile=session["tiling_cost_per_sqft"], room=session["name"],
+                    palette="Blues")
         img_path = os.path.join(app.root_path, "static", "graph.png")
         plt.savefig(img_path)
         plt.close()
+        new_room = Room(**room_data)
+        costs = new_room.calc_cost()
+        with Session() as ss:
+            ss.add(new_room)
+            ss.commit()
+            ss.close()
 
-        ss.add(**room_data)
-        ss.commit()
-        ss.close()
-        return redirect(url_for("index"))
+        return render_template(
+            'add_room.html',
+            name=session.get('name', ''),
+            surface_area=session.get("surface_area", 0.0),
+            flooring_type=session.get("flooring_type", ''),
+            flooring_cost_per_sqft=session.get("flooring_cost_per_sqft", 0.0),
+            tiling=session.get("tiling", ''),
+            tiling_cost_per_sqft=session.get("tiling_cost_per_sqft", 0.0),
+            tiling_area=session.get("tiling_area", 0.0),
+            **costs
+        )
 
-    return render_template('add_room.html', flooring_types=FloorType.__members__.items())
+    return render_template("add_room.html")
 
 
 @app.route("/edit_room")
 def edit_room():
     if request.method == "GET":
         session['room_name'] = request.form["room_name"]
-    return render_template("edit_room.html",room=get_specific_room(session['room_name']))
+    return render_template("edit_room.html", room=get_specific_room(session['room_name']))
+
 
 @app.route("/room_details")
 def room_details():
@@ -71,7 +84,8 @@ def room_details():
 
 
 def get_specific_room(name):
-    return ss.query(Room).filter_by(name=name).first()
+    with Session() as ss:
+        return ss.query(Room).filter_by(name=name).first()
 
 
 def is_tiling_needed(is_tiling):
@@ -84,6 +98,7 @@ def is_tiling_needed(is_tiling):
 @app.route('/add_supplies', methods=['GET', 'POST'])
 def add_supplies():
     if request.method == 'POST':
+        session['name'] = request.form['name']
         session["supply_name"] = request.form["supply_name"]
         session["quantity"] = int(request.form["quantity"])
         session['cost_per_item'] = float(request.form["cost_per_item"])
@@ -95,20 +110,26 @@ def add_supplies():
         }
 
         new_supply = Supply(**supply_data)
-        ss.add(new_supply)
-        ss.commit()
-        ss.close()
+        with Session() as ss:
+            ss.add(new_supply)
+            ss.commit()
+            ss.close()
+
+        return redirect(url_for("index"))
+    return render_template('add_supplies.html', room_name=session["name"], supply_name=session["supply_name"],
+                           quantity=session["quantity"], cost_per_item=session["cost_per_item"])
 
 
 @app.route("/supplies_details", methods=['GET', 'POST'])
 def supply_details(room_id):
-    if request.method == 'POST':
-        room_deets = ss.query(Room).filter(Room.id == room_id).first()
+    with Session() as ss:
+        if request.method == 'POST':
+            room_deets = ss.query(Room).filter(Room.id == room_id).first()
 
-        if room_deets:
-            cost = room_deets.calc_cost()
+            if room_deets:
+                cost = room_deets.calc_cost()
 
-            return render_template("supplies_details.html", room_deets=room_deets, **cost)
+                return render_template("supplies_details.html", room_deets=room_deets, **cost)
 
 
 if __name__ == '__main__':
