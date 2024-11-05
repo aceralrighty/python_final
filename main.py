@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker
 
 import matplotlib.pyplot as plt
 import seaborn as sns
-from models import Room, Supply
+from models import Room, Supply, FloorType, TileType
 
 app = Flask(__name__, )
 app.secret_key = "secret"
@@ -28,10 +28,14 @@ def add_room():
     if request.method == "POST":
         session["name"] = request.form["name"]
         session["surface_area"] = float(request.form["surface_area"])
-        session["flooring_type"] = request.form["flooring_type"]
-        session["flooring_cost_per_sqft"] = float(request.form["flooring_cost_per_sqft"])
-        session["tiling"] = request.form["tiling"]
-        session["tiling_cost_per_sqft"] = float(request.form["tiling_cost_per_sqft"])
+
+        floor_type = request.form["flooring_type"]
+        session["flooring_type"] = floor_type
+        session["flooring_cost_per_sqft"] = float(getattr(FloorType, floor_type).value)
+
+        tiling = request.form["tiling"]
+        session["tiling"] = tiling
+        session["tiling_cost_per_sqft"] = float(getattr(TileType, tiling).value) if tiling else 0
         session["tiling_area"] = float(request.form["tiling_area"])
         room_data = {
             "name": session["name"],
@@ -67,7 +71,7 @@ def add_room():
             **costs
         )
 
-    return render_template("add_room.html")
+    return render_template("add_room.html", flooring_types=FloorType.__members__.items(), flooring_tiles=TileType.__members__.items())
 
 
 @app.route("/edit_room")

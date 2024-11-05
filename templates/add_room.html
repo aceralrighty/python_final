@@ -11,6 +11,7 @@
 {% extends "layout.html" %}
 
 {% block content %}
+    <h2>Add a New Room</h2>
     <form action="/add_room" method="post">
         <label for="name">Room Name</label>
         <input id="name" name="name" type="text" value="{{ name }}">
@@ -20,19 +21,21 @@
 
         <label for="flooring_type">Type of Flooring</label>
         <select id="flooring_type" name="flooring_type">
-            {% for flooring_type in flooring_types %}
-                <option value="{{ flooring_type }}">{{ flooring_type['type'] }} - ${{ flooring_type['price'] }}</option>
+            {% for name, value in flooring_types %}
+                <option value="{{ name }}">{{ name.capitalize() }} - ${{ value.value }}</option>
             {% endfor %}
         </select>
 
         {% if tiling == 'yes' %}
-            <label for="flooring_tile">Flooring Tile</label>
-            <select id="flooring_tile" name="flooring_tile">
-                {% for flooring_tile in flooring_tiles %}
-                    <option value="{{ flooring_tile }}">{{ flooring_tile['type'] }} -
-                        ${{ flooring_tile['price'] }}</option>
+            <label for="tiling">Flooring Tile</label>
+            <select id="tiling" name="tiling">
+                {% for name, value in flooring_tiles %}
+                    <option value="{{ name }}">{{ name.capitalize() }} - ${{ value.value }}</option>
                 {% endfor %}
             </select>
+
+            <label for="tiling_area">Area of Tiling</label>
+            <input type="text" name="tiling_area" id="tiling_area">
         {% endif %}
 
         {% if total_tile_cost is defined and total_tile_cost > 0 %}
