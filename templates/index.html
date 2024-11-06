@@ -30,11 +30,11 @@
                 <td>{{ room.name }}</td>
                 <td>${{ room.calc_cost()['total_remodel_cost'] }}</td>
                 <td>
-                    <form action="/" method="post">
+                    <form method="get">
                         <input type="hidden" name="name" id="name" value="{{ room.name }}">
-                        <input type="submit" name="submit" value="Edit">
-                        <input type="submit" name="submit" value="Details">
-                        <input type="submit" name="submit" value="Add Supplies">
+                        <input type="submit" formaction="/edit_room" value="Edit">
+                        <input type="submit" formaction="/room_details" value="View Details">
+                        <input type="submit" formaction="/add_supplies" value="+ Add Supplies">
                     </form>
                 </td>
             </tr>
