@@ -11,44 +11,39 @@
 {% extends "layout.html" %}
 
 {% block content %}
-    <h2>Add a New Room</h2>
     <form action="/add_room" method="post">
+        <h2>Add a New Room</h2>
         <label for="name">Room Name</label>
-        <input id="name" name="name" type="text" value="{{ name }}">
+        <input id="name" name="name" type="text" value="{{ session.name }}" placeholder="eg. Jarrett's Room">
 
-        <label for="surface_area">Surface Area (sq ft)</label>
-        <input id="surface_area" name="surface_area" type="text" value="{{ surface_area }}">
+        <label for="surface_area">Floor Surface Area (sq. ft.)</label>
+        <input id="surface_area" name="surface_area" type="text" value="{{ session.surface_area }}">
 
         <label for="flooring_type">Type of Flooring</label>
         <select id="flooring_type" name="flooring_type">
             {% for name, value in flooring_types %}
-                <option value="{{ name }}">{{ name.capitalize() }} - ${{ value.value }}</option>
+                <option value="{{ name }}">{{ name.capitalize() }} - ${{ value.value }}/sqft</option>
             {% endfor %}
         </select>
 
-        {% if tiling == 'yes' %}
+        {% if tiling %}
             <label for="tiling">Flooring Tile</label>
             <select id="tiling" name="tiling">
                 {% for name, value in flooring_tiles %}
-                    <option value="{{ name }}">{{ name.capitalize() }} - ${{ value.value }}</option>
+                    <option value="{{ name }}">{{ name.capitalize() }} - ${{ value.value }}/sqft</option>
                 {% endfor %}
             </select>
 
-            <label for="tiling_area">Area of Tiling</label>
+            <label for="tiling_area">Area of Tiling (sq. ft)</label>
             <input type="text" name="tiling_area" id="tiling_area">
         {% endif %}
 
-        {% if total_tile_cost is defined and total_tile_cost > 0 %}
-            <h3>Tiling Details:</h3>
-            <p>Tile Type: {{ tiling }}</p>
-            <p>Tile Cost per Sq Ft: ${{ tiling_cost_per_sqft }}</p>
-            <p>Tiling Area: {{ tiling_area }} sq ft</p>
-            <p>Total Tiling Cost: ${{ total_tile_cost }}</p>
+        {% if not tiling %}
+            <input type="submit" value="+ Add Tiling" name="submit">
+            <input type="submit" value="Add Room (w/o tiling)" name="submit">
         {% else %}
-            <p>No tiling selected for this room.</p>
+            <input type="submit" value="Add Room" name="submit">
         {% endif %}
-
-        <input type="submit" value="Add Room">
     </form>
 {% endblock %}
 </body>
