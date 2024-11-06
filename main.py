@@ -49,9 +49,9 @@ def add_room():
         if request.form['submit'] == "+ Add Tiling":
             return render_template('add_room.html', flooring_types=FloorType.__members__.items(), flooring_tiles=TileType.__members__.items(), tiling=True)
 
-        tiling_check = True if request.form['tiling'] else False
-        tiling = request.form['tiling']
-        session["tiling"] = tiling if tiling_check else ""
+        tiling_check = True if request.form.get('tiling') else False
+        tiling = request.form['tiling'] if tiling_check else ""
+        session["tiling"] = tiling
         session["tiling_cost_per_sqft"] = float(getattr(TileType, tiling).value) if tiling_check else 0
         session["tiling_area"] = float(request.form["tiling_area"]) if tiling_check else 0
 
@@ -76,17 +76,41 @@ def add_room():
     return render_template("add_room.html", flooring_types=FloorType.__members__.items(), flooring_tiles=TileType.__members__.items())
 
 
-@app.route("/edit_room")
+@app.route("/edit_room", methods=["GET", "POST"])
 def edit_room():
-    if request.method == "GET":
-        session['room_name'] = request.form["room_name"]
-    return render_template("edit_room.html", room=get_specific_room(session['room_name']))
+    if request.method == "POST":
+        room = get_specific_room(session["name"])
+        room.name = request.form["name"]
+        room.Surface_Area = request.form["surface_area"]
+
+        floor_type = request.form["flooring_type"]
+        room.Flooring_type = floor_type
+        room.Flooring_cost_per_sqft = float(getattr(FloorType, floor_type).value)
+
+        if request.form['submit'] == "+ Add Tiling":
+            return render_template('edit_room.html',room=get_specific_room(room.name), flooring_types=FloorType.__members__.items(), flooring_tiles=TileType.__members__.items(), tiling=True)
+
+        tiling_check = True if request.form.get('tiling') else False
+        tiling = request.form['tiling'] if tiling_check else ""
+        room.tiling = tiling
+        room.tiling_cost_per_sqft = float(getattr(TileType, tiling).value) if tiling_check else 0
+        room.tiling_area = float(request.form["tiling_area"]) if tiling_check else 0
+
+        with Session() as ss:
+            ss.commit()
+            ss.close()
+
+        return redirect(url_for('index'))
+
+    room_name = request.args.get('name')
+    session["name"] = room_name
+    return render_template("edit_room.html", room=get_specific_room(room_name), flooring_types=FloorType.__members__.items(), flooring_tiles=TileType.__members__.items())
 
 
 @app.route("/room_details")
 def room_details():
-    session['name'] = request.form['name']
-    return render_template('room_details.html', room=get_specific_room(session['name']))
+    room_name = request.args.get('name')
+    return render_template('room_details.html', room=get_specific_room(room_name), flooring_types=FloorType.__members__.items(), flooring_tiles=TileType.__members__.items())
 
 
 def get_specific_room(name):

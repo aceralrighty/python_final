@@ -5,17 +5,21 @@
     <title>Title</title>
 </head>
 <body>
-<form action="/room_details">
-    <label for="name">What is the name of the room you'd like to display? </label>
-    <input type="text" id="name" name="name" required placeholder="This field is required"/>
+    {% extends 'layout.html' %}
+
+    {% block content %}
+    <form action="/room_details">
+        <label for="name">Have another room to lookup? Enter the room name you'd like to display: </label>
+        <input type="text" id="name" name="name" required placeholder="eg. Jarrett's Room"/>
+    </form>
 
     <h2>Room Details</h2>
     <ul>
         <li>Room Name: {{ room.name }}</li>
-        <li>Surface Area: {{ room.surface_area }}</li>
-        <li>Floor Type: {{ room.flooring_type }}</li>
+        <li>Surface Area: {{ room.Surface_Area }}</li>
+        <li>Floor Type: {{ room.Flooring_type }}</li>
         <li>Tiling (if applicable): {{ room.tiling }}</li>
     </ul>
-</form>
+    {% endblock %}
 </body>
 </html>
