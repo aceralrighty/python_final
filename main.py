@@ -18,8 +18,22 @@ Session = sessionmaker(bind=engine)
 @app.route("/")
 def index():
     with Session() as ss:
-        room = ss.query(Room).all()
-        return render_template('index.html', rooms=room, plot_url=url_for("static", filename="graph.png"))
+        rooms = ss.query(Room).all()
+
+        room_names = []
+        room_costs = []
+
+        for room in rooms:
+            room_names.append(room.name)
+            room_costs.append(room.calc_cost()['total_remodel_cost'])
+
+        plt.figure(figsize=(10, 6))
+        sns.barplot(x=room_names, y=room_costs, palette="Blues")
+        img_path = os.path.join(app.root_path, "static", "graph.png")
+        plt.savefig(img_path)
+        plt.close()
+
+        return render_template('index.html', rooms=rooms, plot_url=url_for("static", filename="graph.png"))
 
 
 @app.route("/add_room", methods=["GET", "POST"])
@@ -32,43 +46,32 @@ def add_room():
         session["flooring_type"] = floor_type
         session["flooring_cost_per_sqft"] = float(getattr(FloorType, floor_type).value)
 
-        tiling = request.form["tiling"]
-        session["tiling"] = tiling
-        session["tiling_cost_per_sqft"] = float(getattr(TileType, tiling).value) if tiling else 0
-        session["tiling_area"] = float(request.form["tiling_area"])
+        if request.form['submit'] == "+ Add Tiling":
+            return render_template('add_room.html', flooring_types=FloorType.__members__.items(), flooring_tiles=TileType.__members__.items(), tiling=True)
+
+        tiling_check = True if request.form['tiling'] else False
+        tiling = request.form['tiling']
+        session["tiling"] = tiling if tiling_check else ""
+        session["tiling_cost_per_sqft"] = float(getattr(TileType, tiling).value) if tiling_check else 0
+        session["tiling_area"] = float(request.form["tiling_area"]) if tiling_check else 0
+
         room_data = {
             "name": session["name"],
-            "surface_area": session["surface_area"],
-            "flooring_type": session["flooring_type"],
-            "flooring_cost_per_sqft": session["flooring_cost_per_sqft"],
+            "Surface_Area": session["surface_area"],
+            "Flooring_type": session["flooring_type"],
+            "Flooring_cost_per_sqft": session["flooring_cost_per_sqft"],
             "tiling": session["tiling"],
             "tiling_cost_per_sqft": session["tiling_cost_per_sqft"],
             "tiling_area": session["tiling_area"],
         }
-        plt.figure(figsize=(10, 6))
-        sns.barplot(x="Tiling Cost per Sqft", y="Room Name", tile=session["tiling_cost_per_sqft"], room=session["name"],
-                    palette="Blues")
-        img_path = os.path.join(app.root_path, "static", "graph.png")
-        plt.savefig(img_path)
-        plt.close()
+
         new_room = Room(**room_data)
-        costs = new_room.calc_cost()
         with Session() as ss:
             ss.add(new_room)
             ss.commit()
             ss.close()
 
-        return render_template(
-            'add_room.html',
-            name=session.get('name', ''),
-            surface_area=session.get("surface_area", 0.0),
-            flooring_type=session.get("flooring_type", ''),
-            flooring_cost_per_sqft=session.get("flooring_cost_per_sqft", 0.0),
-            tiling=session.get("tiling", ''),
-            tiling_cost_per_sqft=session.get("tiling_cost_per_sqft", 0.0),
-            tiling_area=session.get("tiling_area", 0.0),
-            **costs
-        )
+        return redirect(url_for('index'))
 
     return render_template("add_room.html", flooring_types=FloorType.__members__.items(), flooring_tiles=TileType.__members__.items())
 
@@ -89,13 +92,6 @@ def room_details():
 def get_specific_room(name):
     with Session() as ss:
         return ss.query(Room).filter_by(name=name).first()
-
-
-def is_tiling_needed(is_tiling):
-    if is_tiling:
-        return True
-    else:
-        return False
 
 
 @app.route('/add_supplies', methods=['GET', 'POST'])
@@ -136,4 +132,4 @@ def supply_details(room_id):
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
