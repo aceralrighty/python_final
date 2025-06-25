@@ -1,9 +1,11 @@
 import os
+
+import matplotlib.pyplot as plt
+import seaborn as sns
 from flask import Flask, render_template, request, redirect, url_for, session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-import matplotlib.pyplot as plt
-import seaborn as sns
+
 from models import Room, Supply, FloorType, TileType
 
 app = Flask(__name__, )
@@ -144,6 +146,8 @@ def supply_details(room_id):
                 cost = room_deets.calc_cost()
 
                 return render_template("supplies_details.html", room_deets=room_deets, **cost)
+            return None
+        return None
 
 
 if __name__ == '__main__':

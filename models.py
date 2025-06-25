@@ -1,4 +1,6 @@
 from enum import Enum as PyEnum
+from typing import Any
+
 from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 
@@ -7,7 +9,6 @@ engine = create_engine('sqlite:///supply_tracker.db')
 Base = declarative_base()
 
 Session = sessionmaker(bind=engine)
-
 
 
 class TileType(PyEnum):
@@ -68,7 +69,8 @@ class Supply(Base):
 
     room = relationship("Room", back_populates="supplies")
 
-    def __init__(self, supply_name, quantity, cost_per_item):
+    def __init__(self, supply_name, quantity, cost_per_item, **kw: Any):
+        super().__init__(**kw)
         self.supply_name = supply_name
         self.quantity = quantity
         self.cost_per_item = cost_per_item
